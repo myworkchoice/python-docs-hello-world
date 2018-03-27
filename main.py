@@ -11,15 +11,9 @@ def get_shifts():
     output = json.loads(input)
 
     if 'firstName' in output:
-        shiftid= output['firstName']
-        return jsonify(
-        {'firstName': shiftid})
-
+        return "Hello there"
     else:
-        return jsonify(
-            {'Shift':output})
-        print(shift)
-        print(shiftid)
+        return "in else part"
 
 
 if __name__ == '__main__':
