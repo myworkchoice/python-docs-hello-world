@@ -1,31 +1,52 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
+#!flask/bin/python
+from flask import Flask, jsonify
+from flask import make_response
+from flask import request
+import json
 
-namespace PackageUploader.Azure
-{
-    public class AzureStorageApi
+app = Flask(__name__)
+
+shift = [
     {
-        public void UploadFile(String fullFilePath, String blobSasUri, Dictionary<String, String> metadata = null)
-        {
-            using (var client = new HttpClient())
-            using (var fileStream = File.OpenRead(fullFilePath))
-            {
-                HttpContent content = new StreamContent(fileStream);
-                content.Headers.Add("x-ms-blob-type", "BlockBlob");
-                foreach (var pair in metadata ?? new Dictionary<string, string>())
-                {
-                    content.Headers.Add("x-ms-meta-" + pair.Key, pair.Value);
-                }
-                var response = client.PutAsync(blobSasUri, content).Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    return;
-                }
-                var exceptionMessage = String.Format("Unable to finish request. Server returned status: {0}; {1}", response.StatusCode, response.ReasonPhrase);
-                throw new ApplicationException(exceptionMessage);
-            }
-        }
+        'id': '5ab5c822ec51f60988318e17',
+        'title': 'Coffe Maker',
+        'startdate': '20180326',
+        'Active': False
+    },
+    {
+        'id': '5ab5c822ec51f60988319e17',
+        'title': 'Marketing Officer',
+        'startdate': '20180329',
+        'Active': True
     }
-}
+]
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
+@app.errorhandler(500)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found'}), 500)
+
+@app.route('/api/v1.0/shift', methods=['GET'])
+def get_shifts():
+    input = request.args.get('shiftin')
+    output = json.loads(input)
+
+    if 'firstName' in output:
+        shiftid= output['firstName']
+        return jsonify(
+        {'firstName': shiftid})
+
+    else:
+        return jsonify(
+            {'Shift':output})
+        print(shift)
+        print(shiftid)
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
